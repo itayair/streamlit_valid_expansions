@@ -14,15 +14,15 @@ HTML_WRAPPER = """<div style="overflow-x: auto; border: 1px solid #e6e9ef; borde
 st.set_page_config(layout="wide")
 
 
-# def install(package):
-#     if hasattr(pip, 'main'):
-#         pip.main(['install', package])
-#     else:
-#         pip._internal.main(['install', package])
-#
-# # Example
-# if __name__ == '__main__':
-#     install("https://storage.googleapis.com/en_ud_model/en_ud_model_sm-2.0.0.tar.gz")
+def install(package):
+    if hasattr(pip, 'main'):
+        pip.main(['install', package])
+    else:
+        pip._internal.main(['install', package])
+
+# Example
+if __name__ == '__main__':
+    install("https://storage.googleapis.com/en_ud_model/en_ud_model_sm-2.0.0.tar.gz")
 
 def load_model():
     nlp = spacy.load("en_ud_model_sm")
