@@ -1,4 +1,4 @@
-altair
+-e git+https://github.com/altair-viz/altair.git
 argon2-cffi
 argon2-cffi-bindings
 astor==0.8.1
