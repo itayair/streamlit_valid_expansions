@@ -5,12 +5,25 @@ import pandas as pd
 from PIL import Image
 import utils as ut
 import valid_deps
+import pip
 
 SPACY_MODEL_NAMES = ["en_core_sci_sm", "en_core_sci_md", "en_core_sci_lg"]
 NER_MODEL_NAMES = ["en_ner_craft_md", "en_ner_jnlpba_md", "en_ner_bc5cdr_md", "en_ner_bionlp13cg_md"]
 DEFAULT_TEXT = "Used in select mask models , this new material improves upon silicone used for three decades in mask skirts with improved light transmission and much greater resistance to discoloration."
 HTML_WRAPPER = """<div style="overflow-x: auto; border: 1px solid #e6e9ef; border-radius: 0.25rem; padding: 1rem; margin-bottom: 2.5rem">{}</div>"""
 st.set_page_config(layout="wide")
+
+
+def install(package):
+    if hasattr(pip, 'main'):
+        pip.main(['install', package])
+    else:
+        pip._internal.main(['install', package])
+
+# Example
+if __name__ == '__main__':
+    install("https://storage.googleapis.com/en_ud_model/en_ud_model_sm-2.0.0.tar.gz")
+
 def load_model():
     nlp = spacy.load("en_ud_model_sm")
     return nlp
