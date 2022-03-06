@@ -9,8 +9,8 @@ dep_type_optional = ['advmod', 'dobj', 'npadvmod', 'nmod', 'nummod', 'conj', 'au
 acl_to_seq = ['acomp', 'dobj', 'nmod']  # acl and relcl + [[['xcomp'], ['aux']], 'dobj']
 others_to_seq = ['quantmod', 'cop']  # 'cc',
 combined_with = ['acl', 'relcl', 'acl:relcl', 'ccomp', 'advcl', 'amod']  # +, 'cc'
-couple_to_seq = {'quantmod': ['amod'], 'cop': ['nsubjpass']}  # 'nsubjpass': ['amod'] ,'cc': ['conj', 'nmod']
-
+couple_to_seq = {'quantmod': ['amod'], 'cop': ['nsubjpass', 'nsubj']}  # 'nsubjpass': ['amod'] ,'cc': ['conj', 'nmod']
+pro_noun_tags_lst = ['WP', 'PRP', 'DET', 'NN', 'NNS']
 
 def get_tied_couple_by_deps(first_dep, second_dep, children):
     first_token = None
@@ -82,6 +82,11 @@ def initialize_couple_lst(others, couple_lst, lst_children):
         dep_type = couple_to_seq[other.dep_]
         for token in lst_children:
             if token.dep_ in dep_type:
+                if other.dep_ == 'cop':
+                    if token.tag_ in pro_noun_tags_lst:
+                        continue
+                #     print(token.tag_)
+                # print(dep_type)
                 couple_lst.append([other, token])
 
 
