@@ -63,7 +63,7 @@ key_for_special_item = 0
 
 
 
-st.title("All Valid expansions in Noun phrase")
+st.title("Valid expansions in Noun phrase")
 
 st.header("Enter a sentence:")
 text = st.text_area("", DEFAULT_TEXT)
@@ -153,9 +153,11 @@ if "expanded_nodes" in st.session_state and st.session_state.expanded_nodes is n
                 expanded_noun.extend(item.span)
         idx += 1
     # create_button_to_expand(buttons_to_expand_noun)
-    c_to_expanded_noun.header("Expanded noun:")
+    c_to_expanded_noun.header("Expanded noun manually")
     expanded_noun.sort(key=lambda x: x.i)
-    c_to_expanded_noun.write(ut.get_tokens_as_span_simple(expanded_noun))
+    col1, col2, col3 = c_to_expanded_noun.columns(3)
+    col2.subheader(ut.get_tokens_as_span_simple(expanded_noun))
+    # st.markdown("<h1 style='text-align: center; color: red;'>Some title</h1>", unsafe_allow_html=True)
     buttons_to_expand = []
     expansion_dict_for_multiselect = {}
     expansion_lst_for_multiselect = []
