@@ -56,6 +56,8 @@ def process_text(head_word_index, text, nlp):
     for tokens in sub_np_final_lst:
         span = ut.get_tokens_as_span(tokens)
         valid_expansion_results.add(span)
+    if noun_phrase[0].tag_ in ['IN', 'TO']:
+        noun_phrase = noun_phrase[1:]
     return list(valid_expansion_results), noun_phrase, root
 
 
@@ -197,7 +199,7 @@ if st.button("Show Parser and Tagger"):
     }
     # docs = [span.as_doc() for span in doc.sents] if split_sents else [doc]
     # for sent in docs:
-    doc = sentence_dep_graph
+    doc = noun_phrase
     html = displacy.render(doc, options=options)
     # Double newlines seem to mess with the rendering
     html = html.replace("\n\n", "\n")
