@@ -133,7 +133,7 @@ if "expanded_nodes" in st.session_state and st.session_state.expanded_nodes is n
             # format_to_write_sent.append()
         format_to_write_sent.append(temp)
     if format_to_write_sent:
-        st.header("Select expansions to the right or to the left")
+        st.header("Select expansions to the right or to the left for specific span")
         c_expansion = st.columns(len(format_to_write_sent))
     idx = 0
     buttons_to_expand_noun = []
