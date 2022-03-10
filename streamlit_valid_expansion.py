@@ -47,23 +47,31 @@ def process_text(head_word_index, text, nlp):
     sent_dep_graph = nlp(text)
     noun_phrase, head_word_in_np_index, boundary_np_to_the_left = ut.get_np_boundary(head_word_index,
                                                                                      sent_dep_graph)
-    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left, head_word_index)
+    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left,
+                                                       head_word_index)
     sub_np_final_lst = []
     sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
-    for sub_np in sub_np_final_lst:
-        sub_np.sort(key=lambda x: x.i)
+    new_format_all_valid_sub_np = ut.get_all_options(root)
+    sub_np_final_lst = []
+    sub_np_final_lst = ut.from_lst_to_sequence_special(new_format_all_valid_sub_np, [])
+    # sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
+    # for sub_np in sub_np_final_lst:
+    #     sub_np.sort(key=lambda x: x.i)
     valid_expansion_results = set()
-    for tokens in sub_np_final_lst:
-        span = ut.get_tokens_as_span(tokens)
-        valid_expansion_results.add(span)
+    for sub_np in sub_np_final_lst:
+        valid_expansion_results.add(ut.list_of_nodes_to_span(sub_np, noun_phrase[head_word_in_np_index]))
+    # for sub_np in sub_np_final_lst:
+    #     sub_np.sort(key=lambda x: x.i)
+    # valid_expansion_results = set()
+    # for tokens in sub_np_final_lst:
+    #     span = ut.get_tokens_as_span(tokens)
+    #     valid_expansion_results.add(span)
     if noun_phrase[0].tag_ in ['IN', 'TO']:
         noun_phrase = noun_phrase[1:]
     return list(valid_expansion_results), noun_phrase, root
 
 
 key_for_special_item = 0
-
-
 
 st.title("Valid expansions in Noun phrase")
 
@@ -125,7 +133,7 @@ if "expanded_nodes" in st.session_state and st.session_state.expanded_nodes is n
             expanded_noun.extend(item.span)
             continue
         temp = []
-        temp.append(("current",item))
+        temp.append(("current", item))
         # format_to_write_sent.append()
         if item.children_to_the_left:
             temp.append(("left", item.children_to_the_left))
@@ -185,8 +193,10 @@ if "expanded_nodes" in st.session_state and st.session_state.expanded_nodes is n
         if st.button("Submit your expansions"):
             for option_to_expand in st.session_state.options:
                 st.write(option_to_expand)
-                st.session_state.expanded_nodes.append(st.session_state.expansion_dict_for_multiselect[option_to_expand][0])
-                st.session_state.expansion_dict_for_multiselect[option_to_expand][1].remove(st.session_state.expansion_dict_for_multiselect[option_to_expand][0])
+                st.session_state.expanded_nodes.append(
+                    st.session_state.expansion_dict_for_multiselect[option_to_expand][0])
+                st.session_state.expansion_dict_for_multiselect[option_to_expand][1].remove(
+                    st.session_state.expansion_dict_for_multiselect[option_to_expand][0])
                 st.session_state.options = []
             st.experimental_rerun()
 
@@ -205,4 +215,3 @@ if st.button("Show Parser and Tagger"):
     html = html.replace("\n\n", "\n")
     st.markdown(f"> {doc.text}")
     st.write(HTML_WRAPPER.format(html), unsafe_allow_html=True)
-

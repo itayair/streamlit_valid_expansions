@@ -30,6 +30,11 @@ for row in csv_reader_used_for_examples:
     all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left, head_word_index)
     sub_np_final_lst = []
     sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
+    new_format_all_valid_sub_np = ut.get_all_options(root)
+    sub_np_final_lst_special = ut.from_lst_to_sequence_special(new_format_all_valid_sub_np, [])
+    valid_expansion_results = set()
+    for sub_np in sub_np_final_lst_special:
+        valid_expansion_results.add(ut.list_of_nodes_to_span(sub_np, noun_phrase[head_word_in_np_index]))
     for sub_np in sub_np_final_lst:
         sub_np.sort(key=lambda x: x.i)
     sub_np_final_lst_collection.append(sub_np_final_lst)

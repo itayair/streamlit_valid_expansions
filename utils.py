@@ -1,7 +1,7 @@
 import itertools
 import sentence_representation as sent_rep
-noun_tags_lst = ['NN', 'NNS', 'WP', 'PRP', 'NNP', 'NNPS']
 
+noun_tags_lst = ['NN', 'NNS', 'WP', 'PRP', 'NNP', 'NNPS']
 
 
 def from_children_to_list(children):
@@ -9,6 +9,7 @@ def from_children_to_list(children):
     for token in children:
         lst_children.append(token)
     return lst_children
+
 
 def get_token_by_dep(lst_children, dep_type):
     lst_tokens = []
@@ -18,10 +19,9 @@ def get_token_by_dep(lst_children, dep_type):
     return lst_tokens
 
 
-
 def powerset(iterable):
     # s = list(iterable)
-    return itertools.chain.from_iterable(itertools.combinations(iterable, r) for r in range(len(iterable)+1))
+    return itertools.chain.from_iterable(itertools.combinations(iterable, r) for r in range(len(iterable) + 1))
 
 
 def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst, root):
@@ -55,7 +55,8 @@ def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst, root):
         sub_np_of_child_lst = []
         for child in sub_np_lst[slice_index:]:
             new_lst_for_child = current_lst.copy()
-            sub_np_of_child, _ = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child, node_in_sentence_representation)
+            sub_np_of_child, _ = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child,
+                                                      node_in_sentence_representation)
             sub_np_of_child_lst.append(sub_np_of_child)
     result_list = list(powerset(sub_np_of_child_lst))
     for item in result_list:
@@ -67,7 +68,6 @@ def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst, root):
                 lst_temp.extend(token)
             sub_np_of_child_lst_final.append(list(set(lst_temp)))
     return sub_np_of_child_lst_final, root
-
 
 
 def is_np_child_head(head_word, word):
@@ -115,6 +115,23 @@ def get_tokens_as_span(tokens):
         idx += 1
     return span
 
+
+def get_tokens_as_span_special(tokens, tokens_with_special_format):
+    span = ""
+    idx = 0
+    for token in tokens:
+        if idx == 0 and token.tag_ in ['IN', 'TO']:
+            continue
+        if idx != 0 and token.text != ',':
+            span += ' '
+        if token in tokens_with_special_format:
+            span += "EXPAND(" + token.text + ")"
+        else:
+            span += token.text
+        idx += 1
+    return span
+
+
 def get_tokens_as_span_simple(tokens):
     span = ""
     idx = 0
@@ -124,6 +141,7 @@ def get_tokens_as_span_simple(tokens):
         span += token.text
         idx += 1
     return span
+
 
 def write_to_file_dict_counter(sub_np_final_lst_collection, output_file):
     with open(output_file, 'w', encoding='utf-8') as f:
@@ -141,3 +159,86 @@ def write_to_file_dict_counter(sub_np_final_lst_collection, output_file):
                 f.write('\n')
             f.write('\n')
         print("Num of duplication:", counter)
+
+
+################################################################
+def list_of_nodes_to_span(list_of_nodes, head_noun):
+    valid_span = []
+    expand_format = []
+    for node in list_of_nodes:
+        valid_span.extend(node.span)
+        if head_noun not in node.span:
+            head_noun_token = None
+            for token in node.span:
+                if token != head_noun and token.tag_ in noun_tags_lst and (
+                        node.children_to_the_left or node.children_to_the_right):
+                    head_noun_token = token
+            if head_noun_token:
+                expand_format.append(head_noun_token)
+    valid_span.sort(key=lambda x: x.i)
+    return get_tokens_as_span_special(valid_span, expand_format)
+
+
+def get_all_options(node):
+    sub_tree = []
+    for child in node.children_to_the_left:
+        has_noun_token = False
+        for token in child.span:
+            if token.tag_ in noun_tags_lst:
+                has_noun_token = True
+        if has_noun_token:
+            sub_tree.append([child])
+        else:
+            sub_tree_child = get_all_options(child)
+            sub_tree.append(sub_tree_child)
+    for child in node.children_to_the_right:
+        has_noun_token = False
+        for token in child.span:
+            if token.tag_ in noun_tags_lst:
+                has_noun_token = True
+        if has_noun_token:
+            sub_tree.append([child])
+        else:
+            sub_tree_child = get_all_options(child)
+            sub_tree.append(sub_tree_child)
+    sub_tree = [node] + sub_tree
+    return sub_tree
+
+
+def from_lst_to_sequence_special(sub_np_lst, current_lst):
+    sub_np_of_child_lst_final = []
+    if isinstance(sub_np_lst[0], list):
+        if len(sub_np_lst) == 1:
+            return from_lst_to_sequence_special(sub_np_lst[0], current_lst)
+        sub_np_of_child_lst = []
+        for child in sub_np_lst:
+            new_lst_for_child = current_lst.copy()
+            sub_np_of_child = from_lst_to_sequence_special(child, new_lst_for_child)
+            sub_np_of_child_lst.append(sub_np_of_child)
+    else:
+        collect_to_lst = []
+        slice_index = 0
+        for item in sub_np_lst:
+            if isinstance(item, list):
+                break
+            collect_to_lst.append(item)
+            slice_index += 1
+        current_lst.extend(collect_to_lst)
+        sub_np_of_child_lst_final.append(current_lst)
+        if len(sub_np_lst) == 1:
+            return [current_lst]
+        sub_np_of_child_lst = []
+        for child in sub_np_lst[slice_index:]:
+            new_lst_for_child = current_lst.copy()
+            sub_np_of_child = from_lst_to_sequence_special(child, new_lst_for_child)
+            sub_np_of_child_lst.append(sub_np_of_child)
+    result_list = list(powerset(sub_np_of_child_lst))
+    for item in result_list:
+        for element in itertools.product(*item):
+            if item == ():
+                continue
+            lst_temp = []
+            for token in element:
+                lst_temp.extend(token)
+            sub_np_of_child_lst_final.append(list(set(lst_temp)))
+    return sub_np_of_child_lst_final
