@@ -27,15 +27,15 @@ for row in csv_reader_used_for_examples:
     if boundary_np_to_the_left > 20:
         continue
     examples_to_visualize.append(noun_phrase)
-    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left)
+    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left, head_word_index)
     sub_np_final_lst = []
-    sub_np_final_lst = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [])
+    sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
     for sub_np in sub_np_final_lst:
         sub_np.sort(key=lambda x: x.i)
     sub_np_final_lst_collection.append(sub_np_final_lst)
     counter += 1
 print(counter)
-# for dep_type in valid_deps.dep_type_in_sequencial:
+# for dep_type in valid_deps.dep_type_in_sequential:
 #     print(dep_type)
 ut.write_to_file_dict_counter(sub_np_final_lst_collection, output_file)
 # doc = nlp("This is a sentence.")

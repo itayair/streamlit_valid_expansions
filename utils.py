@@ -1,5 +1,5 @@
 import itertools
-
+import sentence_representation as sent_rep
 noun_tags_lst = ['NN', 'NNS', 'WP', 'PRP', 'NNP', 'NNPS']
 
 
@@ -24,15 +24,15 @@ def powerset(iterable):
     return itertools.chain.from_iterable(itertools.combinations(iterable, r) for r in range(len(iterable)+1))
 
 
-def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst):
+def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst, root):
     sub_np_of_child_lst_final = []
     if isinstance(sub_np_lst[0], list):
         if len(sub_np_lst) == 1:
-            return from_lst_to_sequence(sub_np_final_lst, sub_np_lst[0], current_lst)
+            return from_lst_to_sequence(sub_np_final_lst, sub_np_lst[0], current_lst, root)
         sub_np_of_child_lst = []
         for child in sub_np_lst:
             new_lst_for_child = current_lst.copy()
-            sub_np_of_child = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child)
+            sub_np_of_child, _ = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child, root)
             sub_np_of_child_lst.append(sub_np_of_child)
     else:
         collect_to_lst = []
@@ -44,12 +44,18 @@ def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst):
             slice_index += 1
         current_lst.extend(collect_to_lst)
         sub_np_of_child_lst_final.append(current_lst)
+        node_in_sentence_representation = sent_rep.Node(collect_to_lst)
+        if root is None:
+            root = node_in_sentence_representation
+        else:
+            root.add_children(node_in_sentence_representation)
+
         if len(sub_np_lst) == 1:
-            return [current_lst]
+            return [current_lst], root
         sub_np_of_child_lst = []
         for child in sub_np_lst[slice_index:]:
             new_lst_for_child = current_lst.copy()
-            sub_np_of_child = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child)
+            sub_np_of_child, _ = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child, node_in_sentence_representation)
             sub_np_of_child_lst.append(sub_np_of_child)
     result_list = list(powerset(sub_np_of_child_lst))
     for item in result_list:
@@ -60,7 +66,7 @@ def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst):
             for token in element:
                 lst_temp.extend(token)
             sub_np_of_child_lst_final.append(list(set(lst_temp)))
-    return sub_np_of_child_lst_final
+    return sub_np_of_child_lst_final, root
 
 
 
@@ -103,6 +109,16 @@ def get_tokens_as_span(tokens):
     for token in tokens:
         if idx == 0 and token.tag_ in ['IN', 'TO']:
             continue
+        if idx != 0 and token.text != ',':
+            span += ' '
+        span += token.text
+        idx += 1
+    return span
+
+def get_tokens_as_span_simple(tokens):
+    span = ""
+    idx = 0
+    for token in tokens:
         if idx != 0 and token.text != ',':
             span += ' '
         span += token.text
