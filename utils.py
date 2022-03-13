@@ -2,8 +2,8 @@ import itertools
 import sentence_representation as sent_rep
 
 noun_tags_lst = ['NN', 'NNS', 'WP', 'PRP', 'NNP', 'NNPS']
-
-
+pro_noun_tags_lst = ['WP', 'PRP', 'DET', 'NN', 'NNS']
+noun_tags_lst_to_expand = ['NNP', 'NNPS']
 def from_children_to_list(children):
     lst_children = []
     for token in children:
@@ -170,11 +170,13 @@ def list_of_nodes_to_span(list_of_nodes, head_noun):
         if head_noun not in node.span:
             head_noun_token = None
             for token in node.span:
-                if token != head_noun and token.tag_ in noun_tags_lst and (
+                if token != head_noun and token.tag_ in noun_tags_lst_to_expand and (
                         node.children_to_the_left or node.children_to_the_right):
                     head_noun_token = token
             if head_noun_token:
                 expand_format.append(head_noun_token)
+    valid_span = set(valid_span)
+    valid_span = list(valid_span)
     valid_span.sort(key=lambda x: x.i)
     return get_tokens_as_span_special(valid_span, expand_format)
 
