@@ -36,7 +36,7 @@ noun_tags_lst = ['NN', 'NNS', 'WP', 'PRP', 'NNP', 'NNPS']
 def get_noun_in_sentence(sentence_dep_graph):
     noun_lst = []
     for token in sentence_dep_graph:
-        if token.tag_ in noun_tags_lst:
+        if token.tag_ in noun_tags_lst and token.dep_ != 'compound':
             noun_lst.append(token)
     return noun_lst
 
