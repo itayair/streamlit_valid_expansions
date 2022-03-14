@@ -12,6 +12,7 @@ combined_with = ['acl', 'relcl', 'acl:relcl', 'ccomp', 'advcl', 'amod']  # +, 'c
 couple_to_seq = {'quantmod': ['amod'], 'cop': ['nsubjpass', 'nsubj']}  # 'nsubjpass': ['amod'] ,'cc': ['conj', 'nmod']
 pro_noun_tags_lst = ['WP', 'PRP', 'DET', 'NN', 'NNS']
 
+
 def get_tied_couple_by_deps(first_dep, second_dep, children):
     first_token = None
     second_token = None
@@ -34,17 +35,19 @@ def get_tied_couples(children):
     return tied_couples_to_add
 
 
-
-
-def combine_tied_deps_recursively_and_combine_their_children(head, boundary_np_to_the_left, head_word_index = -1):
+def combine_tied_deps_recursively_and_combine_their_children(head, boundary_np_to_the_left, head_word_index=-1):
     combined_children_lst = []
     combined_tied_tokens = [head]
     tied_couples_to_add = get_tied_couples(head.children)
     for child in head.children:
         if head_word_index != -1:
             if head.dep_ == 'nmod':
-                if child.tag_ in ['IN', 'TO']:
+                if child.dep_ in ['case', 'mark']:
                     continue
+        # if child.dep_ in ['case', 'mark'] and head.dep_ not in ['nmod', 'nmod:poss']:
+        #     print(head.dep_ + " " + child.dep_ + " " + head.text)
+        # if child.dep_ == 'neg':
+        #     print(child.dep_ + " " + child.text)
         if child.dep_ in tied_deps or child in tied_couples_to_add:
             temp_tokens, temp_children = combine_tied_deps_recursively_and_combine_their_children(child,
                                                                                                   boundary_np_to_the_left)
@@ -53,30 +56,6 @@ def combine_tied_deps_recursively_and_combine_their_children(head, boundary_np_t
         else:
             combined_children_lst.append(child)
     return combined_tied_tokens, combined_children_lst
-
-
-# def get_if_has_preposition_child_between(token, head):
-#     prep_lst = []
-#     for child in token.children:
-#         if child.dep_ == 'case' and child.tag_ == 'IN':
-#             prep_lst.append(child)
-#     if prep_lst:
-#         first_prep_child_index = 100
-#         prep_child = None
-#         for child in prep_lst:
-#             if child.i < first_prep_child_index:
-#                 prep_child = child
-#         if token.i > head.i:
-#             first_val = head.i
-#             second_val = token.i
-#         else:
-#             first_val = token.i
-#             second_val = head.i
-#         if first_val < prep_child.i < second_val:
-#             return prep_child
-#         else:
-#             return None
-#     return None
 
 
 def initialize_couple_lst(others, couple_lst, lst_children):
@@ -197,7 +176,8 @@ def get_children_expansion(sub_np_lst, lst_children, boundary_np_to_the_left, he
     set_couple_deps(couple_lst, boundary_np_to_the_left, sub_np_lst, head)
 
 
-def get_all_valid_sub_np(head, boundary_np_to_the_left, head_word_index = -1):
-    sub_np_lst, lst_children = combine_tied_deps_recursively_and_combine_their_children(head, boundary_np_to_the_left, head_word_index)
+def get_all_valid_sub_np(head, boundary_np_to_the_left, head_word_index=-1):
+    sub_np_lst, lst_children = combine_tied_deps_recursively_and_combine_their_children(head, boundary_np_to_the_left,
+                                                                                        head_word_index)
     get_children_expansion(sub_np_lst, lst_children, boundary_np_to_the_left, head)
     return sub_np_lst
