@@ -21,15 +21,14 @@ for row in csv_reader_used_for_examples:
     sentence_dep_graph = nlp(row[13])
     head_word_index = int(row[5])
     next_catch_word_index = int(row[7])
-    noun_phrase, head_word_in_np_index, boundary_np_to_the_left = ut.get_np_boundary(head_word_index, sentence_dep_graph)
+    noun_phrase, head_word_in_np_index, boundary_length = ut.get_np_boundary(head_word_index, sentence_dep_graph)
     if noun_phrase is None:
         continue
-    if boundary_np_to_the_left > 20:
+    if boundary_length > 20:
         continue
     examples_to_visualize.append(noun_phrase)
-    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left, head_word_index)
-    sub_np_final_lst = []
-    sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
+    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], head_word_index)
+    sub_np_final_lst, root = ut.from_lst_to_sequence(all_valid_sub_np, [], None)
     new_format_all_valid_sub_np = ut.get_all_options(root)
     sub_np_final_lst_special = ut.from_lst_to_sequence_special(new_format_all_valid_sub_np, [])
     valid_expansion_results = set()

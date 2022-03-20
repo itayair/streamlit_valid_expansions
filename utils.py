@@ -24,15 +24,15 @@ def powerset(iterable):
     return itertools.chain.from_iterable(itertools.combinations(iterable, r) for r in range(len(iterable) + 1))
 
 
-def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst, root):
+def from_lst_to_sequence(sub_np_lst, current_lst, root):
     sub_np_of_child_lst_final = []
     if isinstance(sub_np_lst[0], list):
         if len(sub_np_lst) == 1:
-            return from_lst_to_sequence(sub_np_final_lst, sub_np_lst[0], current_lst, root)
+            return from_lst_to_sequence(sub_np_lst[0], current_lst, root)
         sub_np_of_child_lst = []
         for child in sub_np_lst:
             new_lst_for_child = current_lst.copy()
-            sub_np_of_child, _ = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child, root)
+            sub_np_of_child, _ = from_lst_to_sequence(child, new_lst_for_child, root)
             sub_np_of_child_lst.append(sub_np_of_child)
     else:
         collect_to_lst = []
@@ -55,7 +55,7 @@ def from_lst_to_sequence(sub_np_final_lst, sub_np_lst, current_lst, root):
         sub_np_of_child_lst = []
         for child in sub_np_lst[slice_index:]:
             new_lst_for_child = current_lst.copy()
-            sub_np_of_child, _ = from_lst_to_sequence(sub_np_final_lst, child, new_lst_for_child,
+            sub_np_of_child, _ = from_lst_to_sequence(child, new_lst_for_child,
                                                       node_in_sentence_representation)
             sub_np_of_child_lst.append(sub_np_of_child)
     result_list = list(powerset(sub_np_of_child_lst))
@@ -159,6 +159,14 @@ def write_to_file_dict_counter(sub_np_final_lst_collection, output_file):
                 f.write('\n')
             f.write('\n')
         print("Num of duplication:", counter)
+
+
+def get_noun_in_sentence(sentence_dep_graph):
+    noun_lst = []
+    for token in sentence_dep_graph:
+        if token.tag_ in noun_tags_lst and token.dep_ != 'compound':
+            noun_lst.append(token)
+    return noun_lst
 
 
 ################################################################

@@ -29,30 +29,15 @@ def load_model():
     return nlp
 
 
-noun_tags_lst = ['NN', 'NNS', 'WP', 'PRP', 'NNP', 'NNPS']
-
-
-# @st.cache(allow_output_mutation=True)
-def get_noun_in_sentence(sentence_dep_graph):
-    noun_lst = []
-    for token in sentence_dep_graph:
-        if token.tag_ in noun_tags_lst and token.dep_ != 'compound':
-            noun_lst.append(token)
-    return noun_lst
-
-
 # @st.cache(allow_output_mutation=True)
 def process_text(head_word_index, text, nlp):
     # nlp = spacy.load("en_ud_model_sm")
     sent_dep_graph = nlp(text)
-    noun_phrase, head_word_in_np_index, boundary_np_to_the_left = ut.get_np_boundary(head_word_index,
-                                                                                     sent_dep_graph)
-    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], boundary_np_to_the_left,
-                                                       head_word_index)
-    sub_np_final_lst = []
-    sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
+    noun_phrase, head_word_in_np_index, boundary_length = ut.get_np_boundary(head_word_index,
+                                                                             sent_dep_graph)
+    all_valid_sub_np = valid_deps.get_all_valid_sub_np(noun_phrase[head_word_in_np_index], head_word_index)
+    sub_np_final_lst, root = ut.from_lst_to_sequence(all_valid_sub_np, [], None)
     new_format_all_valid_sub_np = ut.get_all_options(root)
-    sub_np_final_lst = []
     sub_np_final_lst = ut.from_lst_to_sequence_special(new_format_all_valid_sub_np, [])
     # sub_np_final_lst, root = ut.from_lst_to_sequence(sub_np_final_lst, all_valid_sub_np, [], None)
     # for sub_np in sub_np_final_lst:
@@ -79,7 +64,7 @@ st.header("Enter a sentence:")
 text = st.text_area("", DEFAULT_TEXT)
 nlp = load_model()
 sentence_dep_graph = nlp(text)
-noun_lst = get_noun_in_sentence(sentence_dep_graph)
+noun_lst = ut.get_noun_in_sentence(sentence_dep_graph)
 attrs = ["valid expansion"]
 
 st.header("Choose Noun to get all the valid expansions:")
