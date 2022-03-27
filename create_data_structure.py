@@ -3,7 +3,8 @@ import utils as ut
 import valid_deps
 import sentence_representation
 import csv
-
+import json
+import jsonpickle
 
 noun_tags_lst = ['NN', 'NNS', 'WP', 'NNP', 'NNPS']
 nlp = spacy.load("en_ud_model_sm")
@@ -33,6 +34,8 @@ def fill_all_head_phrase_in_tree(root, sentence):
     head_phrase = dict_noun_to_object.get(root.basic_span, None)
     if head_phrase is None:
         head_phrase = sentence_representation.head_phrase(root.basic_span)
+        if root.basic_span == "":
+            print("error")
         dict_noun_to_object[root.basic_span] = head_phrase
     head_phrase.add_new_node(root, sentence)
     dict_noun_to_counter[root.basic_span] = dict_noun_to_counter.get(root.basic_span, 0) + 1
@@ -47,8 +50,8 @@ dict_noun_to_counter = {}
 def create_data_structure(sentences):
     counter = 0
     for sent in sentences:
-        # if counter > 500:
-        #     break
+        if counter > 200:
+            break
         sentence_dep_graph = nlp(sent)
         head_noun_lst = get_head_noun_in_sentence(sentence_dep_graph)
         if head_noun_lst is []:
@@ -62,11 +65,6 @@ def create_data_structure(sentences):
             all_valid_sub_np = valid_deps.get_all_valid_sub_np(head_noun, head_noun.i)
             sub_np_final_lst, root = ut.from_lst_to_sequence(all_valid_sub_np, [], None)
             fill_all_head_phrase_in_tree(root, sent)
-            # head_phrase = dict_noun_to_object.get(root.basic_span, None)
-            # if head_phrase is None:
-            #     head_phrase = sentence_representation.head_phrase(root.basic_span)
-            #     dict_noun_to_object[root.basic_span] = head_phrase
-            # head_phrase.add_new_node(root, sent)
         counter += 1
         if counter % 100 == 0:
             print(counter)
@@ -81,4 +79,9 @@ for row in csv_reader_used_for_examples:
     sent_to_collect.append(row[13])
 
 create_data_structure(sent_to_collect)
+print(sentence_representation.counter_error_example)
+# for key, value in dict_noun_to_object.items():
+val = jsonpickle.encode(dict_noun_to_object)
+# json_str = json.dumps(val, indent=2)
+print(val)
 print("Done!")

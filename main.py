@@ -34,9 +34,12 @@ for row in csv_reader_used_for_examples:
     valid_expansion_results = set()
     for sub_np in sub_np_final_lst_special:
         valid_expansion_results.add(ut.list_of_nodes_to_span(sub_np, noun_phrase[head_word_in_np_index]))
+    sub_np_final_lst_new = []
     for sub_np in sub_np_final_lst:
-        sub_np.sort(key=lambda x: x.i)
-    sub_np_final_lst_collection.append(sub_np_final_lst)
+        sub_np.sort(key=lambda x: x[0].i)
+        sub_np_new = [x[0] for x in sub_np]
+        sub_np_final_lst_new.append(sub_np_new)
+    sub_np_final_lst_collection.append(sub_np_final_lst_new)
     counter += 1
 print(counter)
 # for dep_type in valid_deps.dep_type_in_sequential:
