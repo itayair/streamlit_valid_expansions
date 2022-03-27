@@ -1,4 +1,4 @@
-import json
+# import json
 
 attr_of_node = ['det', 'neg', 'auxpass', 'aux', 'auxpass']
 
@@ -91,6 +91,6 @@ class head_phrase:
     # def toJSON(self):
     #     return json.dumps(self, default=vars,
     #                       sort_keys=True, indent=4)
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: _try(o), sort_keys=True, indent=0, separators=(',', ':')).replace(
-            '\n', '')
+    # def toJSON(self):
+    #     return json.dumps(self, default=lambda o: _try(o), sort_keys=True, indent=0, separators=(',', ':')).replace(
+    #         '\n', '')

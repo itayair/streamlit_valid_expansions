@@ -70,18 +70,18 @@ def create_data_structure(sentences):
             print(counter)
 
 
-nlp = spacy.load("en_ud_model_sm")
-used_for_examples = open('./csv/examples_used_for.csv', encoding="utf8")
-csv_reader_used_for_examples = csv.reader(used_for_examples)
-header = next(csv_reader_used_for_examples)
-sent_to_collect = []
-for row in csv_reader_used_for_examples:
-    sent_to_collect.append(row[13])
-
-create_data_structure(sent_to_collect)
-print(sentence_representation.counter_error_example)
-# for key, value in dict_noun_to_object.items():
-val = jsonpickle.encode(dict_noun_to_object)
-# json_str = json.dumps(val, indent=2)
-print(val)
-print("Done!")
+# nlp = spacy.load("en_ud_model_sm")
+# used_for_examples = open('./csv/examples_used_for.csv', encoding="utf8")
+# csv_reader_used_for_examples = csv.reader(used_for_examples)
+# header = next(csv_reader_used_for_examples)
+# sent_to_collect = []
+# for row in csv_reader_used_for_examples:
+#     sent_to_collect.append(row[13])
+#
+# create_data_structure(sent_to_collect)
+# print(sentence_representation.counter_error_example)
+# # for key, value in dict_noun_to_object.items():
+# val = jsonpickle.encode(dict_noun_to_object)
+# # json_str = json.dumps(val, indent=2)
+# print(val)
+# print("Done!")
